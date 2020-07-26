@@ -1,0 +1,396 @@
+<div class="signup-panel" ng-controller="signup-index-add-controller">
+	<!-- RightPart -->
+	<div class="sider-container aticalAttr" cloudscrollbar>
+		<div class="item">
+			<div class="row category-row" dropdown auto-close="outsideClick">
+				<div dropdown-toggle>
+					<label>选择栏目</label>
+					<i class="cloud-icon-font-dropdown pull-right"></i>
+					<div class="categoryresult pull-right" ng-bind="categoryAlias.join(',')||''"></div>
+				</div>
+				<div class="dropdown-menu">
+					<div treemenu value="category" value-alias="categoryAlias" enable-set-recently="true"></div>
+				</div>
+			</div>
+			<div class="add-edit">
+				<a><span ng-class="{active:addEditActive}" ng-click="addTem()">添加字段</span>
+					<span ng-class="{active:addEditActiveT}" ng-click="editTem()">编辑字段</span></a>
+			</div>
+			<div class="addRightContenair" ng-show="addTemMo">
+				<!-- 缩略图 -->
+				<div thumb-creater="thumbData"></div>
+				<!-- 头图 -->
+		        <div class="thumb-outter" id="bannerItem">
+		            <div  ng-click="openThumbDialog('banner')" class="thumb" ng-class="{'thumb-bg':banner.url}">
+		                <img ng-src="{{banner.url}}" ng-show="banner.url" />
+		            </div>
+					<div class="thumb-title" ng-click="openThumbDialog('banner')">上传头图</div>
+		        </div>
+				<div class="modalList">
+					<h5>通用字段</h5>
+					<ul>
+						<li ng-class="{active:temActive==$index}" ng-click="temClick($index,rightTem.title)" ng-repeat="rightTem in rightTemplates"><button class="btn singleRow">{{rightTem.title}}</button></li>
+						<div class="clear"></div>
+					</ul>
+				</div>
+				<div class="author-row">
+					<div>
+						<input type="text" tag-input="author" value="{{author}}" options="{
+                                maxnum: 5,
+                                suggestUrl: '/system/author/suggest',
+                                suggestCount: 5
+                            }" placeholder="作者，用逗号分隔" />
+					</div>
+				</div>
+				<div class="formDate">
+					<h5>表单开始/停止设置</h5>
+					<h5 class="setTime" style="padding-bottom:6px;"></i> 设置开启/停止时间</h5>
+					<div class="row timeoutOn">
+						<span class="pull-left">开始时间</span>
+						<div class="pull-right">
+							<span class="date-text" ng-bind="timingOn(onTime)||'设置'" ng-click="showOnTime()">
+                            </span>
+							<i class="icon-dropdown cloud-icon-font-dropdown" ng-click="showOnTime()"></i>
+							<input class="date-input" type="text" disabled="disabled" ui-datepicker="yyyy/MM/dd HH:mm" ng-model="_timeOn" />
+						</div>
+					</div>
+					<div class="row timeoutOff">
+						<span class="pull-left">结束时间</span>
+						<div class="pull-right">
+							<span class="date-text" ng-bind="timingOff(offTime)||'设置'" ng-click="showOffTime()">
+                                
+                            </span>
+							<i class="icon-dropdown cloud-icon-font-dropdown" ng-click="showOffTime()"></i>
+							<input class="date-input" type="text" disabled="disabled" ui-datepicker="yyyy/MM/dd HH:mm" ng-model="_timeOff" />
+						</div>
+					</div>
+				</div>
+				<div class="set">
+					<h5>设置数据上限</h5>
+					<div>最多可接受 <input class="setNum" type="number" ng-model="setLimitNum" value="1000"/> 条数据</div>
+				</div>
+				<div class="addLogin">
+					<span>是否登录填表</span>
+					<div class="flipswitch" style="display: inline-block;vertical-align: middle;">
+						<div class="flipswitch-panel ng-isolate-scope flipswitch1" ng-click="flipclick()" flipswitch="flipswitch" water="enableWater(bool)">
+							<div class="flipswitch-background">
+								<div class="flipswitch-button">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="addTemplate">
+					<h5>选择表单模板</h5>
+					<!--加载图标-->
+					<div class="content-mask" ng-hide="tpListState">
+						<i class="cloud-icon-ui-loading-gray"></i>
+					</div>
+					<ul cloudscrollbar onbottom="listpage.nextPage" style="height: 300px;">
+						<div ng-show="nodata">暂无任何模板</div>
+						<div class="text-center loading" ng-show="loadtip"><i class="loading cloud-icon-ui-loading-gray"></i></div>
+						<li ng-repeat="item in tpList.data" ng-click="addTemplateActiveClick(item.id)">
+							<span class="title">{{item.title}}</span>
+							<span class="pull-right" ng-show="pullRight==item.id" ><span ng-click="temPreview(item.id)">预览</span><span ng-click="addTemplateOpen(item.id)">启用</span></span>
+						</li>
+						<div ng-show="tpList.total>tpList.offset" class="text-center"><i class="cloud-icon-ui-loading-gray" style="margin: 10px 0;"></i></div>
+					</ul>
+				</div>
+			</div>
+			<!--编辑字段-->
+			<div class="addRightEdit" ng-show="editTemMo">
+				<!--右侧内容显示-->
+				<div class="rightEdit " >
+					<div class="rightTitle">{{rightEdit.title}}</div>
+					<div ng-show="rightRowTem=='multiRowTem'||rightRowTem=='singleRowTem'||rightRowTem=='radioGroupTem'||rightRowTem=='multipleChoiceTem'||rightRowTem=='activeDateTem'||rightRowTem=='spinnerTem'||rightRowTem=='accessoryTem'" class="rightTitle">标题</div>
+					<input ng-keyup="rightContentOne(rightEdits, $event)" ng-show="rightRowTem=='multiRowTem'||rightRowTem=='singleRowTem'||rightRowTem=='radioGroupTem'||rightRowTem=='multipleChoiceTem'||rightRowTem=='activeDateTem'||rightRowTem=='spinnerTem'||rightRowTem=='accessoryTem'" ng-model="rightEdits.rightTitle" class="rightTex" type="text" />
+
+					<div ng-show="rightRowTem=='multiRowTem'||rightRowTem=='singleRowTem'" class="rightTitle">默认值</div>
+
+					<input ng-keyup="rightContentTwo(rightEdits)" ng-show="rightRowTem=='singleRowTem'" ng-model="rightEdits.defaultvalue" class="rightTex" type="text" value="" />
+
+					<textarea ng-keyup="rightContentTwo(rightEdits)" ng-show="rightRowTem=='multiRowTem'" ng-model="rightEdits.multiDefaultvalue" style="width: 280px;height: 100px;resize: none;border:1px solid #d7d7d7;outline:none;border-radius:4px;padding: 10px;"></textarea>
+
+					<div ng-show="rightRowTem=='radioGroupTem'||rightRowTem=='multipleChoiceTem'||rightRowTem=='spinnerTem'">
+						<div class="rightTitle">选项</div>
+						<div id="rightDrag">
+							<div class="rightSelect" ng-repeat="select in rightSelect">
+								<i tooltip="隐藏" style="display: none;" tooltip-placement="bottom" tooltip-animation="false" tooltip-append-to-body="true" ng-click="rightHideClick($index)" class="cloud-icon-function-view"></i>
+								<span ng-class="{radioes:select.radioes}" style=" border-radius: 50%;" ng-show="rightRowTem=='radioGroupTem'" ng-click="rightChecked($index)" ></span>
+								<span ng-class="{checkboxs:select.checkboxes}" style=" border-radius: 3px;" ng-show="rightRowTem=='multipleChoiceTem'" ng-click="rightChecked($index)" ></span>
+								<input ng-model="select.listvalue" ng-keyup="listvalueInput($index)" type="text" style="width: 150px;" />
+								<i tooltip="添加" tooltip-placement="bottom" tooltip-animation="false" tooltip-append-to-body="true" ng-click="rightAddClick()" class="cloud-fonticon-ui-add"></i>
+								<i tooltip="删除" tooltip-placement="bottom" tooltip-animation="false" tooltip-append-to-body="true" ng-click="rightDelClick($index)" class="cloud-icon-function-trash"></i>
+								<i tooltip="拖拽" tooltip-placement="bottom" tooltip-animation="false" tooltip-append-to-body="true" class="cloud-fonticon-nav-apps"></i>
+							</div>
+						</div>
+						<div ng-show="rightRowTem=='radioGroupTem'||rightRowTem=='multipleChoiceTem'">
+							<div class="rightTitle">排列方式</div>
+							<div class="selectArrangement">
+								<span ng-class="{editCross:editCross==1}" ng-click="leftCross()" ></span><em>横向排列</em>
+								<span ng-class="{editCross:editCross==2}"  ng-click="leftPortrait()" ></span><em>竖向排列</em>
+								<!--<span><input type="radio" ng-checked="rightCross" name="checkedArrangement" ng-click="leftCross()" />横向排列</span>
+								<span><input type="radio" ng-checked="rightCross" name="checkedArrangement" ng-click="leftPortrait()"/>竖向排列</span>-->
+							</div>
+						</div>
+					</div>
+					<div ng-show="rightRowTem=='multiRowTem'||rightRowTem=='singleRowTem'||rightRowTem=='radioGroupTem'||rightRowTem=='multipleChoiceTem'||rightRowTem=='activeDateTem'||rightRowTem=='spinnerTem'||rightRowTem=='accessoryTem'">
+						<div class="rightTitle">提示</div>
+						<div class="rightScroll" >
+							<textarea ng-keyup="rightContentThree(rightEdits)" ng-model="rightEdits.detail" style="width: 280px;height: 100px;resize: none;border:1px solid #d7d7d7;outline:none;border-radius:4px;padding: 10px;"></textarea>
+						</div>
+					</div>
+					<div ng-show="rightRowTem=='multiRowTem'||rightRowTem=='singleRowTem'||rightRowTem=='radioGroupTem'||rightRowTem=='multipleChoiceTem'||rightRowTem=='activeDateTem'||rightRowTem=='spinnerTem'||rightRowTem=='accessoryTem'" class="rightTitle">校验<span>(选中以*号提示)</span></div>
+
+					<div ng-show="rightRowTem=='multiRowTem'||rightRowTem=='singleRowTem'||rightRowTem=='radioGroupTem'||rightRowTem=='multipleChoiceTem'||rightRowTem=='activeDateTem'||rightRowTem=='spinnerTem'||rightRowTem=='accessoryTem'" class="rightCheckbox">
+						<i ng-class="{checkM:isMust}" ng-click="isMustClick()"></i>
+						<lebel>必填</lebel>
+					</div>
+
+					<div ng-show="rightRowTem=='multiRowTem'">
+						<div class="rightCheckbox" style="margin-top: 10px;"><i ng-model="isMustMin" ng-class="{checkM:isMustMin}" ng-click="isMustMinClick()"></i>
+							<lebel>最少可填 
+								<input ng-model="rightEdits.minNumber"  ng-blur="rightContentFour(rightEdits)" class="minNumber" type="number" /> 个字</lebel>
+						</div>
+						<div class="rightCheckbox" style="margin-top: 10px;"><i ng-class="{checkM:isMustMax}" ng-click="isMustMaxClick()"></i>
+							<lebel>最多可填 
+								<input ng-model="rightEdits.maxNumber" ng-blur="rightContentFour(rightEdits)" class="maxNumber" type="number" /> 个字</lebel>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- LeftPart -->
+	<div class="main-container">
+		<!--返回设置-->
+		<div class="goback">
+			<a href="javascript:;" ng-click="goback()"><i>< </i>返回</a>
+		</div>
+
+		<div class="publish-panel">
+			<i class="cloud-icon-setting-nav-audit btn" ng-class="{active:data.enableAudit}" ng-click="switchMode(!data.enableAudit);" ng-hide="onpublish||!view.enableAuditCheckbox" tooltip="{{data.enableAudit ? '取消送审' : '递交审核'}}" tooltip-placement="bottom" tooltip-animation="false" tooltip-append-to-body="true"></i>
+			<i class="cloud-icon-ui-important btn" ng-class="{active:data.isImportant&&data.enableAudit,disabled:view.enablePriority===2&&!data.enableAudit}" ng-click="data.isImportant=!data.isImportant" ng-hide="onpublish||view.enablePriority===0" tooltip="{{data.isImportant ? '取消加急' : '加急'}}" tooltip-placement="bottom" tooltip-animation="false" tooltip-append-to-body="true"></i>
+
+			<a class="submit" href="javascript:;" ng-click="submit()" ng-hide="onpublish">{{view.publishBtn}}</a>
+			<div ng-show="onpublish"><i class="cloud-icon-ui-loading-gray onpublish"></i></div>
+		</div>
+		<!--内容-->
+		<div class="center-panel text-center">
+			<div class="top-panel" ng-bind="isNewContent ? '新建表单' : '编辑表单'"></div>
+			<div class="left-mask" ng-show="leftLoading">
+					<i class="cloud-icon-ui-loading-gray"></i>
+			</div>
+			<div class="editor-container-outter" ng-show="isEdit">
+				<div class="editor-container" cloudscrollbar  >
+					<div class="editor-container-inner">
+						<div class="fromImg" ng-show="banner.url"><img ng-src="{{banner.url}}" alt="表单头图" /></div>
+						<div id="signup-add-title" class="ng-pristine ng-valid" style="position: relative;padding-bottom:10px;">
+							<textarea class="editor-text editor-title" type="text" placeholder="表单标题" ng-model="title" ng-trim=false tabindex="1"></textarea>
+							<span class="editor-title-stat" ng-if="title"><span ng-class="{warn:wordCount(title)>titleNum}">{{wordCount(title)||0}}</span>/{{titleNum}}</span>
+						</div>
+						<!--添加编辑器-->
+						<div class="editor-content" style="height: 300px;margin-bottom:20px;padding-bottom:166px;width:662px;margin-left: -6px;">
+							<textarea id="editor" name="content" class="editor-editor hide"></textarea>
+						</div>
+						<div id="signup-add-adrs" class="ng-pristine ng-valid" style="position: relative;">
+							<input class="address" type="text" placeholder="地址" ng-model="address" ng-trim=false tabindex="1" />
+						</div>
+						<p class="dataTip" ng-show="dataAll.length<1">
+							请从右侧点击添加字段
+						</p>
+						<div id="leftDrag">
+							<div class="dataAll" ng-repeat="data in dataAll">
+								<!--单行文本-->
+								<div class="addList singleRowTem" ng-if="data.styles=='singleRowTem'" ng-click="rowTemClick(data.styles,data.title,$index)" >
+									<i class="del cloud-fonticon-ui-remove"></i>
+									<div class="row" >
+										<div class="addListContenair singleRow">
+												<p>{{data.leftTitle}}<i ng-show="data.isMust" class="checkIcon">*</i></p>
+												<div ng-show="data.detail.length>0" class="dataDetail" ng-bind-html-unsafe="data.detail||''"></div>
+												<div class="portrait">
+													<div class="input-text">{{data.defaultvalue}}</div>
+											</div>
+										</div>
+									</div>
+									<i class="cloud-fonticon-nav-apps"></i>
+									<div class="clear"></div>
+								</div>
+								<!--多行文本-->
+								<div class="addList multiRowTem" ng-if="data.styles=='multiRowTem'" ng-click="rowTemClick(data.styles,data.title,$index)">
+									<i class="del cloud-fonticon-ui-remove"></i>
+									<div class="row " >
+										<div class="addListContenair multiRow">
+											<p>{{data.leftTitle}}<i ng-show="data.isMust" class="checkIcon">*</i></p>
+											<div ng-show="data.detail.length>0" class="dataDetail"  ng-bind-html-unsafe="data.detail||''"></div>
+											<div style="position: relative;">
+											<div class="text-area">{{data.multiDefaultvalue}}</div>
+											<span class="editor-title-stat" ><span ng-class="{warn:wordCount(data.multiDefaultvalue)>titleNum}">{{data.minNumber||0}}</span>/{{data.maxNumber}}</span>
+										    </div>
+										</div>
+
+									</div>
+									<i class="cloud-fonticon-nav-apps"></i>
+								</div>
+								<!--单项选择-->
+								<div class="addList radioGroupTem" ng-if="data.styles=='radioGroupTem'" ng-click="rowTemClick(data.styles,data.title,$index)">
+									<i class="del cloud-fonticon-ui-remove"></i>
+									<div class="row " >
+										<div class="addListContenair radioGroup">
+											<p>{{data.leftTitle}}<i ng-show="data.isMust" class="checkIcon">*</i></p>
+											<div ng-show="data.detail.length>0" class="dataDetail" ng-bind-html-unsafe="data.detail||''"></div>
+											<div ng-class="{crosswise:data.crosswise}" class="portrait">
+												<div ng-repeat="ridio in data.leftSelect" ng-show="ridio.rightShow">
+													<span ng-class="{radioes:ridio.radioes}" style=" border-radius: 50%;" ></span><span>{{ridio.listvalue}}</span>
+												</div>
+											</div>
+										</div>
+									</div>
+									<i class="cloud-fonticon-nav-apps"></i>
+								</div>
+								<!--多项选择-->
+								<div class="addList multipleChoiceTem" ng-if="data.styles=='multipleChoiceTem'" ng-click="rowTemClick(data.styles,data.title,$index)">
+									<i class="del cloud-fonticon-ui-remove"></i>
+									<div class="row " >
+										<div class="addListContenair multipleChoice">
+											<p>{{data.leftTitle}}<i ng-show="data.isMust" class="checkIcon">*</i></p>
+											<div ng-show="data.detail.length>0" class="dataDetail" ng-bind-html-unsafe="data.detail||''"></div>
+											<div ng-class="{crosswise:data.crosswise}" class="portrait">
+												<div ng-repeat="checkBox in data.leftSelect" ng-show="checkBox.rightShow" class="leftChecked">
+												    <span ng-class="{checkboxs:checkBox.checkboxes}" style="border-radius: 3px;"></span><span>{{checkBox.listvalue}}</span>
+												</div>
+											</div>
+										</div>
+										
+									</div>
+									<i class="cloud-fonticon-nav-apps"></i>
+								</div>
+								<!--日期-->
+								<div class="addList activeDateTem" ng-if="data.styles=='activeDateTem'" ng-click="rowTemClick(data.styles,data.title,$index)">
+									<i class="del cloud-fonticon-ui-remove"></i>
+									<div class="row " >
+										<div class="addListContenair activeDate">
+											<p>{{data.leftTitle}}<i ng-show="data.isMust" class="checkIcon">*</i></p>
+											<div ng-show="data.detail.length>0" class="dataDetail" ng-bind-html-unsafe="data.detail||''"></div>
+											<div class="portrait">
+												<div class="input-text"></div>
+											</div>
+										</div>
+									</div>
+									<i class="cloud-fonticon-nav-apps"></i>
+
+								</div>
+								<!--下拉框-->
+								<div class="addList spinnerTem" ng-if="data.styles=='spinnerTem'" ng-click="rowTemClick(data.styles,data.title,$index)">
+									<i class="del cloud-fonticon-ui-remove"></i>
+									<div class="row ">
+										<div class="addListContenair spinner">
+											<p>{{data.leftTitle}}<i ng-show="data.isMust" class="checkIcon">*</i></p>
+											<div ng-show="data.detail.length>0" class="dataDetail" ng-bind-html-unsafe="data.detail||''"></div>
+											<select class="portrait" disabled="disabled">
+												<option ng-repeat="select in data.leftSelect" ng-show="select.rightShow" value="">{{select.listvalue}}</option>
+											</select>
+										</div>
+									</div>
+									<i class="cloud-fonticon-nav-apps"></i>
+
+								</div>
+								<!--添加附件-->
+								<div class="addList accessoryTem" ng-if="data.styles=='accessoryTem'" ng-click="rowTemClick(data.styles,data.title,$index)">
+									<i class="del cloud-fonticon-ui-remove"></i>
+									<div class="row ">
+										<div class="addListContenair accessory">
+											<p>{{data.leftTitle}}<i ng-show="data.isMust" class="checkIcon">*</i></p>
+											<div ng-show="data.detail.length>0" class="dataDetail" ng-bind-html-unsafe="data.detail||''"></div>
+											<div class="btn " attachment="data.attachments" uploading="uploading" orignfiles="serverAttachments" max-files="2"></div>
+											<span class="tips">支持上传图片(JPG/PNG/PDF)、视频、音频</span>
+										</div>
+									</div>
+									<i class="cloud-fonticon-nav-apps"></i>
+								</div>
+								<!--提交按钮-->
+								<!--<div class="addList submitBtnTem" ng-show="data.styles=='submitBtnTem'">
+									<div class="row ">
+										<div class="addListContenair submitBtn">
+											<button class="btn">{{data.leftTitle}}</button>
+										</div>
+									</div>
+								</div>-->
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="addOperateMode" ng-hide="save">
+					<button class="btn addsave" ng-click="addSave()">保存表单</button>
+					<button class="btn addpreview" ng-click="addPreview()">预览</button>
+					<button class="btn addTemplates" ng-click="addTemplates()">添加到模板</button>
+				</div>
+				<div ng-show="save"><i class="cloud-icon-ui-loading-gray onpublish"></i></div>
+				<p class="draftSave"></p>
+			</div>
+		</div>
+	</div>
+	<!--敏感词-->
+	<!--<div dialog ng-show="showSensitiveDialog" width="865" height="580">
+		<div sensitive-content-picker onclose="closeSensitiveDialog()" onsave="saveSensitiveDialog(result)">
+		</div>
+	</div>-->
+	<!--预览弹框-->
+	<div id="preview">
+		<div class="modal fade" id="addSectionModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<span class="pull-left" ng-click="pullRightClose()">关闭</span>
+						<span class="title">表单预览</span>
+						<!--<span class="pull-right"><i class="cloud-icon-channel-pc" ng-class="{active:pcActive}" ng-click="pcClick()"></i>
+	       					<i class="cloud-icon-channel-phone" ng-class="{active:phoneActive}" ng-click="phoneClick()"></i>
+	       				</span>-->
+					</div>
+					<div class="modalBody" cloudscrollbar>
+						<ng-include src="'/assets/module/signup/index/template/addModel.html'">
+						</ng-include>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--模板添加操作-->
+	<div class="modal fade" id="addTemplate" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<span class="title">添加到模板</span>
+				</div>
+				<div class="modalBody">
+					<p>是否重命名模板?</p>
+					<div>
+						<span>模板名称 : </span>
+						<input ng-model="titles" type="text" value="{{title}}"/>
+					</div>
+					<div class="pull-right">
+						<a ng-click="cancelTemplate()">取消</a>
+						<a ng-click="saveTemplate()">保存</a>
+					</div>
+			   </div>
+		   </div>
+		</div>
+	</div>
+	<!--模板预览-->
+	<div id="preview">
+		<div class="modal fade" id="templateSectionModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<span class="pull-left" ng-click="pullRightClose()">关闭</span>
+						<span class="title">模板预览</span>
+					</div>
+					<div class="modalBody" cloudscrollbar>
+						<ng-include src="'/assets/module/signup/index/template/temModel.html'">
+						</ng-include>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
