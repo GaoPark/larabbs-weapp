@@ -1,0 +1,39 @@
+
+<html>
+<head>
+</head>
+<body>
+<script type="text/javascript" src = "js/jquery.js"></script>
+<script type="text/javascript">
+    $(function(){
+        $("#list01 input[type=checkbox]").click(function(){
+            $(this).parent().next().toggle();
+            console.log($(this).attr("id"));
+            //这是打印了点击元素的id
+            console.log($(this).parent().attr("id"));
+            //这是打印了，点击元素父元素的id
+            console.log($(this).parent().next().attr("id"));
+            //这是打印了，input元素的父元素dt元素的，相邻的后面的兄弟元素的id；
+        });
+        $("#list01 dd").hide();
+    });
+</script>
+<dl id="list01">
+    <dt id = "11">
+        <input type="checkbox" id = "111">名
+    </dt>
+    <dd id = "12">田</dd>
+    <dt id = "21">
+        <input type="checkbox" id = "211">所属
+    </dt>
+    <dd id = "22">大学</dd>
+    <dt id = "31">
+        <input type="checkbox" id = "311">生年月日
+    </dt>
+    <dd id = "32">1999年3 月3 日</dd>
+</dl>
+</body>
+
+————————————————
+版权声明：本文为CSDN博主「Yuyuquan」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/qq_27918787/java/article/details/52585870
